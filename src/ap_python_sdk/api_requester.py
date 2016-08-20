@@ -1,6 +1,6 @@
+import base64
 import calendar
 import datetime
-import platform
 import time
 import urllib
 import urlparse
@@ -79,12 +79,12 @@ class APIRequester(object):
         return _build_api_url(url, cls.encode(params))
 
     def request(self, method, url, params=None, headers=None):
-        rbody, rcode, rheaders, my_api_key = self.request_raw(
+        rbody, rcode = self.request_raw(
             method.lower(), url, params, headers)
-        resp = self.interpret_response(rbody, rcode, rheaders)
-        return resp, my_api_key
+        resp = self.interpret_response(rbody, rcode)
+        return resp
 
-    def handle_api_error(self, rbody, rcode, error_response, rheaders):
+    def handle_api_error(self, rbody, rcode, error_response):
         try:
             error_type = error_response['Type']
             if error_type == 'payment_error':
@@ -122,14 +122,14 @@ class APIRequester(object):
                 abs_url = _build_api_url(abs_url, encoded_params)
             post_data = None
         elif method == 'post':
-                post_data = encoded_params
+                post_data = util.json.dumps(params or {})
         else:
             raise error.APIError(
                 'Unrecognized HTTP method %r.' % (method))
 
         headers = {
-            'User-Agent': 'AlternativePayments Ruby SDK v/%s' % (version.VERSION),
-            'Authorization': 'Bearer %s' % (my_api_key,),
+            'User-Agent': 'AlternativePayments Python SDK v%s' % (version.VERSION),
+            'Authorization': 'Basic %s' % (base64.b64encode(my_api_key),),
             'Content-Type': 'application/json'
         }
 
@@ -138,7 +138,7 @@ class APIRequester(object):
             for key, value in supplied_headers.items():
                 headers[key] = value
 
-        rbody, rcode, rheaders = self._client.request(
+        rbody, rcode = self._client.request(
             method, abs_url, headers, post_data)
 
         util.logger.info('%s %s %d', method.upper(), abs_url, rcode)
@@ -146,9 +146,9 @@ class APIRequester(object):
             'API request to %s returned (response code, response body) of '
             '(%d, %r)',
             abs_url, rcode, rbody)
-        return rbody, rcode, rheaders, my_api_key
+        return rbody, rcode
 
-    def interpret_response(self, rbody, rcode, rheaders):
+    def interpret_response(self, rbody, rcode):
         try:
             if hasattr(rbody, 'decode'):
                 rbody = rbody.decode('utf-8')
@@ -157,30 +157,7 @@ class APIRequester(object):
             raise error.APIError(
                 "Invalid response body from API: %s "
                 "(HTTP response code was %d)" % (rbody, rcode),
-                rbody, rcode, rheaders)
+                rbody, rcode)
         if not (200 <= rcode < 300):
-            self.handle_api_error(rbody, rcode, resp, rheaders)
+            self.handle_api_error(rbody, rcode, resp)
         return resp
-
-    # TODO: check if this will be used.
-    def requests_request(self, method, url, headers, params):
-        from ap_python_sdk.http_client import RequestsClient
-        method = method.lower()
-
-        if method == 'get' or method == 'delete':
-            if params:
-                url = self.build_url(url, params)
-            post_data = None
-        elif method == 'post':
-            post_data = self.encode(params)
-        else:
-            raise error.APIError(
-                'Unrecognized HTTP method %r.' % (method,))
-
-        client = RequestsClient()
-        return client.request(method, url, headers, post_data)
-
-    def handle_requests_error(self, err):
-        from ap_python_sdk.http_client import RequestsClient
-        client = RequestsClient()
-        return client._handle_request_error(err)

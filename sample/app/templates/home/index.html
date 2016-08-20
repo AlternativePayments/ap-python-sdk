@@ -3,9 +3,9 @@
     <td><strong>Options:</strong></td>
   </tr>
   <tr>
-    <td><a href="<%= new_customer_path %>">Add customer</a></td>
-    <td><a href="<%= customer_index_path %>">Get customer</a></td>
-    <td><a href="<%= customers_path %>">Get all customers</a></td>
+    <td><a href="{% url 'add_customer' %}">Add customer</a></td>
+    <td><a href="{% url 'retrieve_customer' %}">Retrieve customer</a></td>
+    <td><a href="{% url 'all_customers' %}">Get all customers</a></td>
   </tr>
   <tr>
     <td><table>

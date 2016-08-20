@@ -1,21 +1,20 @@
 import sys
 import urllib
-import warnings
 
-from ap_python_sdk import api_requester, error, util
+from ap_python_sdk import api_requester, util
 
 
-def convert_to_ap_object(resp, api_key):
+def convert_to_ap_object(resp, class_url):
     types = {
-        '/customer': Customer
+        '/customers': Customer
     }
 
     if isinstance(resp, list):
-        return [convert_to_ap_object(i, api_key) for i in resp]
+        return [convert_to_ap_object(i, class_url) for i in resp]
     elif isinstance(resp, dict) and not isinstance(resp, BaseModel):
         resp = resp.copy()
-        klass = types.get(api_key, BaseModel)
-        return klass.construct_from(resp, api_key)
+        klass = types.get(class_url, BaseModel)
+        return klass.construct_from(resp)
     else:
         return resp
 
@@ -28,41 +27,12 @@ def _compute_diff(current, previous):
         return diff
     return current if current is not None else ""
 
-def _serialize_list(array, previous):
-    array = array or []
-    previous = previous or []
-    params = {}
-
-    for i, v in enumerate(array):
-        previous_item = previous[i] if len(previous) > i else None
-        if hasattr(v, 'serialize'):
-            params[str(i)] = v.serialize(previous_item)
-        else:
-            params[str(i)] = _compute_diff(v, previous_item)
-
-    return params
-
-
 class BaseModel(dict):
-    def __init__(self, id=None, api_key=None, **params):
+    def __init__(self, **params):
         super(BaseModel, self).__init__()
 
-        self._unsaved_values = set()
-        self._transient_values = set()
-
-        self._retrieve_params = params
-        self._previous = None
-
-        object.__setattr__(self, 'api_key', api_key)
-
-        if id:
-            self['id'] = id
-
-    def update(self, update_dict):
-        for k in update_dict:
-            self._unsaved_values.add(k)
-
-        return super(BaseModel, self).update(update_dict)
+        for k, v in params.iteritems():
+            self.__setitem__(k, v)
 
     def __setattr__(self, k, v):
         if k[0] == '_' or k in self.__dict__:
@@ -95,12 +65,6 @@ class BaseModel(dict):
 
         super(BaseModel, self).__setitem__(k, v)
 
-        # Allows for unpickling in Python 3.x
-        if not hasattr(self, '_unsaved_values'):
-            self._unsaved_values = set()
-
-        self._unsaved_values.add(k)
-
     def __getitem__(self, k):
         try:
             return super(BaseModel, self).__getitem__(k)
@@ -110,27 +74,14 @@ class BaseModel(dict):
     def __delitem__(self, k):
         super(BaseModel, self).__delitem__(k)
 
-        # Allows for unpickling in Python 3.x
-        if hasattr(self, '_unsaved_values'):
-            self._unsaved_values.remove(k)
-
     @classmethod
-    def construct_from(cls, values, key):
-        instance = cls(values.get('id'), api_key=key)
+    def construct_from(cls, values):
+        instance = cls(**values)
         return instance
 
     @classmethod
     def api_base(cls):
         return None
-
-    def request(self, method, url, params=None, headers=None):
-        if params is None:
-            params = self._retrieve_params
-        requester = api_requester.APIRequester(
-            key=self.api_key, api_base=self.api_base())
-        response, api_key = requester.request(method, url, params, headers)
-
-        return convert_to_ap_object(response, api_key)
 
     def __repr__(self):
         ident_parts = [type(self).__name__]
@@ -152,156 +103,92 @@ class BaseModel(dict):
     def to_dict(self):
         return dict(self)
 
-    def serialize(self, previous):
-        params = {}
-        unsaved_keys = self._unsaved_values or set()
-        previous = previous or self._previous or {}
+class Pagination(BaseModel):
+    pass
 
-        for k, v in self.items():
-            if k == 'id' or (isinstance(k, str) and k.startswith('_')):
-                continue
-            elif isinstance(v, APIResource):
-                continue
-            elif hasattr(v, 'serialize'):
-                params[k] = v.serialize(previous.get(k, None))
-            elif k in unsaved_keys:
-                params[k] = _compute_diff(v, previous.get(k, None))
-            elif k == 'additional_owners' and v is not None:
-                params[k] = _serialize_list(v, previous.get(k, None))
+class Collection(dict):
 
-        return params
+    def __init__(self, params):
+        super(Collection, self).__init__()
 
+        for k, v in params.iteritems():
+            self.__setitem__(k, v)
+
+    def __setitem__(self, k, v):
+        if v == "":
+            raise ValueError(
+                "You cannot set %s to an empty string. "
+                "We interpret empty strings as None in requests."
+                "You may set %s.%s = None to delete the property" % (
+                    k, str(self), k))
+
+        super(Collection, self).__setitem__(k, v)
+
+    # TODO: Fix to create object of Pagination.
+    def pagination(self, pagination):
+        self.pagination = Pagination(pagination)
 
 class APIResource(BaseModel):
 
     @classmethod
-    def retrieve(cls, id, api_key=None, **params):
-        instance = cls(id, api_key, **params)
-        return instance
-
-    @classmethod
-    def class_name(cls):
-        if cls == APIResource:
-            raise NotImplementedError(
+    def class_url(cls):
+        raise NotImplementedError(
                 'APIResource is an abstract class.  You should perform '
                 'actions on its subclasses (e.g. Customer)')
-        return str(urllib.quote_plus(cls.__name__.lower()))
 
     @classmethod
-    def class_url(cls):
-        cls_name = cls.class_name()
-        return "/v1/%ss" % (cls_name,)
-
-class ListObject(BaseModel):
-
-    def list(self, **params):
-        return self.request('get', self['url'], params)
-
-    def all(self, **params):
-        return self.list(**params)
-
-    def auto_paging_iter(self):
-        page = self
-        params = dict(self._retrieve_params)
-
-        while True:
-            item_id = None
-            for item in page:
-                item_id = item.get('id', None)
-                yield item
-
-            if not getattr(page, 'has_more', False) or item_id is None:
-                return
-
-            params['starting_after'] = item_id
-            page = self.list(**params)
-
-    def create(self, idempotency_key=None, **params):
-        headers = {}
-        return self.request('post', self['url'], params, headers)
-
-    def retrieve(self, id, **params):
-        base = self.get('url')
-        id = util.utf8(id)
-        extn = urllib.quote_plus(id)
-        url = "%s/%s" % (base, extn)
-
-        return self.request('get', url, params)
-
-    def __iter__(self):
-        return getattr(self, 'data', []).__iter__()
-
-
-class SingletonAPIResource(APIResource):
-
-    @classmethod
-    def retrieve(cls, **params):
-        return super(SingletonAPIResource, cls).retrieve(None, **params)
-
-    @classmethod
-    def class_url(cls):
-        cls_name = cls.class_name()
-        return "/v1/%s" % (cls_name,)
-
-    def instance_url(self):
-        return self.class_url()
-
+    def list_members(cls):
+        raise NotImplementedError('APIResource is an abstract class.'
+                                ' You should use it\'s subclasses (Customer, Payment, etc.)')
 
 # Classes of API operations
 class ListableAPIResource(APIResource):
 
     @classmethod
-    def all(cls, *args, **params):
-        return cls.list(*args, **params)
+    def all(cls, api_key=None, **pagination_options):
+        requester = api_requester.APIRequester(api_key)
+        class_url = cls.class_url()
+        url = '%s/' % class_url
 
-    @classmethod
-    def auto_paging_iter(self, *args, **params):
-        return self.list(*args, **params).auto_paging_iter()
-
-    @classmethod
-    def list(cls, api_key=None, idempotency_key=None, **params):
-        requester = api_requester.APIRequester(api_key,
-                                               api_base=cls.api_base())
-        url = cls.class_url()
-        response, api_key = requester.request('get', url, params)
-        ap_object = convert_to_ap_object(response, api_key)
-        ap_object._retrieve_params = params
-        return ap_object
+        response = requester.request('get', url, pagination_options)
+        list = convert_to_ap_object(response[cls.list_members()], class_url)
+        return Collection({
+                           'items': list,
+                           'pagination': response['pagination']
+        })
 
 
 class CreateableAPIResource(APIResource):
 
     @classmethod
-    def create(cls, api_key=None, idempotency_key=None, **params):
+    def create(cls, params={}, api_key=None):
         requester = api_requester.APIRequester(api_key)
         url = cls.class_url()
         headers = {}
-        response, api_key = requester.request('post', url, params, headers)
-        return convert_to_ap_object(response, api_key)
+        response = requester.request('post', url, params, headers)
 
+        return convert_to_ap_object(response, url)
 
-class UpdateableAPIResource(APIResource):
+class RetrivableAPIResource(APIResource):
 
     @classmethod
-    def _modify(cls, url, api_key=None, idempotency_key=None, **params):
+    def retrieve(self, id, params={}, api_key=None):
         requester = api_requester.APIRequester(api_key)
+        class_url = self.class_url()
         headers = {}
-        response, api_key = requester.request('post', url, params, headers)
-        return convert_to_ap_object(response, api_key)
 
-    @classmethod
-    def modify(cls, sid, **params):
-        url = "%s/%s" % (cls.class_url(), urllib.quote_plus(util.utf8(sid)))
-        return cls._modify(url, **params)
+        url = "%s/%s" % (class_url, id)
 
-class DeletableAPIResource(APIResource):
-
-    def delete(self, **params):
-        self.request('delete', self.instance_url(), params)
-        return self
-
+        response = requester.request('get', url, params, headers)
+        return convert_to_ap_object(response, class_url)
 
 # API objects
-class Customer(CreateableAPIResource, UpdateableAPIResource,
-               ListableAPIResource, DeletableAPIResource):
-    pass
+class Customer(CreateableAPIResource, ListableAPIResource, RetrivableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/customers'
+
+    @classmethod
+    def list_members(cls):
+        return 'customers'

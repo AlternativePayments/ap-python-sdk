@@ -1,0 +1,11 @@
+<a href="{% url 'index' %}">Home</a>
+<br/>
+
+{{customers.pagination}}
+<br/>
+
+{% for customer in customers.items %}
+    {{ forloop.counter }}
+    <label>{{index}}. {{customer}}</label>
+    <br/>
+{% endfor %}
