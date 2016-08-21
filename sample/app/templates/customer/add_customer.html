@@ -1,0 +1,11 @@
+<a href="{% url 'index' %}">Home</a>
+
+<form action="{% url 'add_customer' %}", method="post">
+    {% csrf_token %}
+    <label>Insert email: </label>
+    <input id="email" name="email" type="text">
+
+   <input type="submit" value="Create">
+</form>
+
+<label>{{customer}}</label>
