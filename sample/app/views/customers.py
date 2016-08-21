@@ -3,10 +3,6 @@ from django.template import loader
 
 from ap_python_sdk.resources import Customer
 
-def index(request):
-    template = loader.get_template('home/index.html')
-    return HttpResponse(template.render({}, request))
-
 def add_customer(request):
     template = loader.get_template('customer/add_customer.html')
 

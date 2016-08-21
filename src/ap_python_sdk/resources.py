@@ -1,5 +1,4 @@
 import sys
-import urllib
 
 from ap_python_sdk import api_requester, util
 
@@ -63,7 +62,10 @@ class BaseModel(dict):
                 "You may set %s.%s = None to delete the property" % (
                     k, str(self), k))
 
-        super(BaseModel, self).__setitem__(k, v)
+        if getattr(self, k, None) != None:
+            getattr(self, k)(**v)
+        else:
+            super(BaseModel, self).__setitem__(k, v)
 
     def __getitem__(self, k):
         try:
@@ -122,11 +124,14 @@ class Collection(dict):
                 "You may set %s.%s = None to delete the property" % (
                     k, str(self), k))
 
-        super(Collection, self).__setitem__(k, v)
+        # We need items condition here as dictionary has builtin items() method.
+        if k != 'items' and getattr(self, k, None) != None:
+            getattr(self, k)(**v)
+        else:
+            super(Collection, self).__setitem__(k, v)
 
-    # TODO: Fix to create object of Pagination.
-    def pagination(self, pagination):
-        self.pagination = Pagination(pagination)
+    def pagination(self, **pagination):
+        self.pagination = Pagination(**pagination)
 
 class APIResource(BaseModel):
 
@@ -151,9 +156,9 @@ class ListableAPIResource(APIResource):
         url = '%s/' % class_url
 
         response = requester.request('get', url, pagination_options)
-        list = convert_to_ap_object(response[cls.list_members()], class_url)
+        list_objects = convert_to_ap_object(response[cls.list_members()], class_url)
         return Collection({
-                           'items': list,
+                           'items': list_objects,
                            'pagination': response['pagination']
         })
 
@@ -192,3 +197,37 @@ class Customer(CreateableAPIResource, ListableAPIResource, RetrivableAPIResource
     @classmethod
     def list_members(cls):
         return 'customers'
+
+class Payment(BaseModel):
+    pass
+
+class RedirectUrls(BaseModel):
+    pass
+
+class PhoneVerification(BaseModel):
+
+    @classmethod
+    def class_url(cls):
+        return '/phoneverification'
+
+class Transaction(CreateableAPIResource, ListableAPIResource, RetrivableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/transactions'
+
+    @classmethod
+    def list_members(cls):
+        return 'transactions'
+    
+    def customer(self, **customer):
+        self.customer = Customer(**customer)
+
+    def payment(self, **payment):
+        self.payment = Payment(**payment)
+
+    def redirectUrls(self, **redirectUrls):
+        self.redirectUrls = RedirectUrls(**redirectUrls)
+
+    def phoneverification(self, **phoneverification):
+        self.phoneverification = PhoneVerification(**phoneverification)
