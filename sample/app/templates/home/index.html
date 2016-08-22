@@ -10,36 +10,36 @@
   <tr>
     <td><table>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :sepa) %>">Add SEPA transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=sepa">Add SEPA transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :brazil_pay_boleto) %>">Add BrazilPayBoleto transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=brazil_pay_boleto">Add BrazilPayBoleto transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :brazil_pay_bank_transfer) %>">Add BrazilPayBankTransfer transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=brazil_pay_bank_transfer">Add BrazilPayBankTransfer transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :teleingreso) %>">Add Teleingreso transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=teleingreso">Add Teleingreso transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :safetypay) %>">Add SafetyPay transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=safetypay">Add SafetyPay transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :poli) %>">Add POLi transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=poli">Add POLi transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :ideal) %>">Add IDEAL transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=ideal">Add IDEAL transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :trustpay) %>">Add TrustPay transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=trustpay">Add TrustPay transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :mistercash) %>">Add MisterCash transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=mistercash">Add MisterCash transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :przelewy24) %>">Add Przelewy24 transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=przelewy24">Add Przelewy24 transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :giropay) %>">Add GiroPay transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=giropay">Add GiroPay transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :credit_card) %>">Add Credit Card transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=credit_card">Add Credit Card transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :directpay) %>">Add DirectPay transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=directpay">Add DirectPay transaction</a></td></tr>
       <tr>
-        <td><a href="<%= new_transaction_url(:transaction_type => :directpaymax) %>">Add DirectPayMax transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=directpaymax">Add DirectPayMax transaction</a></td></tr>
     </table></td>
-    <td><a href="<%= transaction_index_path %>">Get transaction</a></td>
-    <td><a href="<%= transactions_path %>">Get all transactions</a></td>
+    <td><a href="{% url 'retrieve_transaction' %}">Get transaction</a></td>
+    <td><a href="{% url 'all_transactions' %}">Get all transactions</a></td>
   </tr>
   <tr>
     <td><a href="<%= new_subscription_path %>">Add subscription</a></td>

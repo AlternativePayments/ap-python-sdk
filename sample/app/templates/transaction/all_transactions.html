@@ -1,0 +1,11 @@
+<a href="{% url 'index' %}">Home</a>
+<br/>
+
+{{transactions.pagination}}
+<br/>
+
+{% for transaction in transactions.items %}
+    {{ forloop.counter }}
+    <label>{{index}}. {{transaction}}</label>
+    <br/>
+{% endfor %}
