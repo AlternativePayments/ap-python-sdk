@@ -1,0 +1,21 @@
+<a href="{% url 'index' %}">Home</a>
+<br/>
+
+<form action="{% url 'all_refunds' %}" method="get">
+    <label>Insert transaction id: </label>
+    <input id="transaction_id" name="transaction_id" type="text">
+
+    <input type="submit" value="Retrieve all refunds">
+</form>
+
+<br/>
+{% if refunds %}
+    {{refunds.pagination}}
+    <br/>
+
+    {% for refund in refunds.items %}
+        {{ forloop.counter }}
+        <label>{{index}}. {{refund}}</label>
+        <br/>
+    {% endfor %}
+{% endif %}

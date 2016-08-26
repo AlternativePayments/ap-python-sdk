@@ -1,0 +1,10 @@
+<a href="{% url 'index' %}">Home</a>
+
+<form action="{% url 'retrieve_subscription' %}" method="get">
+    <label>Insert subscription id: </label>
+    <input id="subscription_id" name="subscription_id" type="text">
+
+    <input type="submit" value="Retrieve">
+</form>
+
+<label>{{subscription}}</label>

@@ -1,3 +1,5 @@
+from __builtin__ import classmethod
+from dulwich.web import url_prefix
 import sys
 
 from ap_python_sdk import api_requester, util
@@ -5,7 +7,14 @@ from ap_python_sdk import api_requester, util
 
 def convert_to_ap_object(resp, class_url):
     types = {
-        '/customers': Customer
+        '/customers': Customer,
+        '/preauthorizations': Preauthorization,
+        '/phoneverification': PhoneVerification,
+        '/transactions': Transaction,
+        '/plans': Plan,
+        '/subscriptions': Subscription,
+        '/voids': Void,
+        '/refunds': Refund
     }
 
     if isinstance(resp, list):
@@ -32,12 +41,6 @@ class BaseModel(dict):
 
         for k, v in params.iteritems():
             self.__setitem__(k, v)
-
-    def __setattr__(self, k, v):
-        if k[0] == '_' or k in self.__dict__:
-            return super(BaseModel, self).__setattr__(k, v)
-        else:
-            self[k] = v
 
     def __getattr__(self, k):
         if k[0] == '_':
@@ -67,15 +70,6 @@ class BaseModel(dict):
         else:
             super(BaseModel, self).__setitem__(k, v)
 
-    def __getitem__(self, k):
-        try:
-            return super(BaseModel, self).__getitem__(k)
-        except KeyError as err:
-            raise err
-
-    def __delitem__(self, k):
-        super(BaseModel, self).__delitem__(k)
-
     @classmethod
     def construct_from(cls, values):
         instance = cls(**values)
@@ -84,6 +78,13 @@ class BaseModel(dict):
     @classmethod
     def api_base(cls):
         return None
+
+    @classmethod
+    def url_with_prefix(cls, url_prefix):
+        if url_prefix != None:
+            return '%s%s' % (url_prefix, cls.class_url())
+        else:
+            return cls.class_url()
 
     def __repr__(self):
         ident_parts = [type(self).__name__]
@@ -100,7 +101,9 @@ class BaseModel(dict):
             return unicode_repr
 
     def __str__(self):
-        return util.json.dumps(self, sort_keys=True, indent=2)
+        temp_dict = dict(self, **self.__dict__)
+
+        return util.json.dumps(temp_dict, sort_keys=True, indent=2)
 
     def to_dict(self):
         return dict(self)
@@ -150,42 +153,36 @@ class APIResource(BaseModel):
 class ListableAPIResource(APIResource):
 
     @classmethod
-    def all(cls, api_key=None, **pagination_options):
+    def all(cls, api_key=None, url_prefix=None, **pagination_options):
         requester = api_requester.APIRequester(api_key)
-        class_url = cls.class_url()
-        url = '%s/' % class_url
 
-        response = requester.request('get', url, pagination_options)
-        list_objects = convert_to_ap_object(response[cls.list_members()], class_url)
+        response = requester.request('get', '%s/' % cls.url_with_prefix(url_prefix), pagination_options)
+        list_objects = convert_to_ap_object(response[cls.list_members()], cls.class_url())
         return Collection({
                            'items': list_objects,
-                           'pagination': response['pagination']
+                           'pagination': response.get('pagination', {})
         })
 
 
 class CreateableAPIResource(APIResource):
 
     @classmethod
-    def create(cls, params={}, api_key=None):
+    def create(cls, params={}, url_prefix=None, api_key=None):
         requester = api_requester.APIRequester(api_key)
-        url = cls.class_url()
         headers = {}
-        response = requester.request('post', url, params, headers)
+        response = requester.request('post', cls.url_with_prefix(url_prefix), params, headers)
 
-        return convert_to_ap_object(response, url)
+        return convert_to_ap_object(response, cls.class_url())
 
 class RetrivableAPIResource(APIResource):
 
     @classmethod
-    def retrieve(self, id, params={}, api_key=None):
+    def retrieve(self, id, params={}, url_prefix=None, api_key=None):
         requester = api_requester.APIRequester(api_key)
-        class_url = self.class_url()
         headers = {}
+        response = requester.request('get', "%s/%s" % (self.url_with_prefix(url_prefix), id), params, headers)
 
-        url = "%s/%s" % (class_url, id)
-
-        response = requester.request('get', url, params, headers)
-        return convert_to_ap_object(response, class_url)
+        return convert_to_ap_object(response, self.class_url())
 
 # API objects
 class Customer(CreateableAPIResource, ListableAPIResource, RetrivableAPIResource):
@@ -204,7 +201,23 @@ class Payment(BaseModel):
 class RedirectUrls(BaseModel):
     pass
 
-class PhoneVerification(BaseModel):
+class Preauthorization(CreateableAPIResource, RetrivableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/preauthorizations'
+
+    @classmethod
+    def list_members(cls):
+        return 'preauthorizations'
+
+    def customer(self, **customer):
+        self.customer = Customer(**customer)
+
+    def payment(self, **payment):
+        self.payment = Payment(**payment)
+
+class PhoneVerification(CreateableAPIResource, RetrivableAPIResource):
 
     @classmethod
     def class_url(cls):
@@ -219,7 +232,49 @@ class Transaction(CreateableAPIResource, ListableAPIResource, RetrivableAPIResou
     @classmethod
     def list_members(cls):
         return 'transactions'
-    
+
+    @classmethod
+    def void(self, reason='', transaction_id=None):
+        if transaction_id == None:
+            transaction_id = self.id
+
+        return Void.create({'reason': reason}, '%s/%s' % (self.class_url(), transaction_id))
+
+    @classmethod
+    def retrieve_void(self, void_id=None, transaction_id=None):
+        if transaction_id == None:
+            transaction_id = self.id
+
+        return Void.retrieve(void_id, {}, '%s/%s' % (self.class_url(), transaction_id))
+
+    @classmethod
+    def voids(self, transaction_id=None):
+        if transaction_id == None:
+            transaction_id = self.id
+
+        return Void.all(url_prefix='%s/%s' % (self.class_url(), transaction_id))
+
+    @classmethod
+    def refund(self, reason='', transaction_id=None):
+        if transaction_id == None:
+            transaction_id = self.id
+
+        return Refund.create({'reason': reason}, '%s/%s' % (self.class_url(), transaction_id))
+
+    @classmethod
+    def retrieve_refund(self, refund_id=None, transaction_id=None):
+        if transaction_id == None:
+            transaction_id = self.id
+
+        return Refund.retrieve(refund_id, {}, '%s/%s' % (self.class_url(), transaction_id))
+
+    @classmethod
+    def refunds(self, transaction_id=None):
+        if transaction_id == None:
+            transaction_id = self.id
+
+        return Refund.all(url_prefix='%s/%s' % (self.class_url(), transaction_id))
+
     def customer(self, **customer):
         self.customer = Customer(**customer)
 
@@ -231,3 +286,74 @@ class Transaction(CreateableAPIResource, ListableAPIResource, RetrivableAPIResou
 
     def phoneverification(self, **phoneverification):
         self.phoneverification = PhoneVerification(**phoneverification)
+
+class Plan(CreateableAPIResource, RetrivableAPIResource, ListableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/plans'
+
+    @classmethod
+    def list_members(cls):
+        return 'plans'
+
+class Subscription(CreateableAPIResource, RetrivableAPIResource, ListableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/subscriptions'
+
+    @classmethod
+    def list_members(cls):
+        return 'subscriptions'
+
+    def customer(self, **customer):
+        self.customer = Customer(**customer)
+
+    def payment(self, **payment):
+        self.payment = Payment(**payment)
+
+    def plan(self, **plan):
+        self.plan = Plan(**plan)
+
+class Void(CreateableAPIResource, RetrivableAPIResource, ListableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/voids'
+
+    @classmethod
+    def list_members(cls):
+        return 'voidTransactions'
+
+    def originalTransaction(self, **originalTransaction):
+        self.originalTransaction = Transaction(**originalTransaction)
+
+class Refund(CreateableAPIResource, RetrivableAPIResource, ListableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/refunds'
+
+    @classmethod
+    def list_members(cls):
+        return 'refundTransactions'
+
+    def originalTransaction(self, **originalTransaction):
+        self.originalTransaction = Transaction(**originalTransaction)
+
+# Enumeration classes
+class Period(dict):
+
+    DAY = 'Day'
+    WEEK = 'Week'
+    MONTH = 'Month'
+    YEAR = 'Year'
+
+class RefundReason:
+
+    CHARGEBACK_AVOIDANCE = 'CHARGEBACK_AVOIDANCE'
+    END_USER_ERROR = 'END_USER_ERROR'
+    FRAUD = 'FRAUD'
+    UNSATISFIED_CUSTOMER = 'UNSATISFIED_CUSTOMER'
+    INVALID_TRANSACTION = 'INVALID_TRANSACTION'

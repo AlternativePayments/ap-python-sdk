@@ -1,6 +1,7 @@
 import logging
-import sys
 import os
+import sys
+
 
 logger = logging.getLogger('alternative_payments')
 

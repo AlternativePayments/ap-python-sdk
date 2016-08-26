@@ -11,7 +11,7 @@ def add_transaction(request):
 
     if transaction_type != None:
         transaction = {}
-        if transaction_type == "'sepa'".encode('utf8'):
+        if transaction_type == 'sepa':
             transaction = __create_sepa_transaction()
 
         elif transaction_type == 'brazil_pay_boleto':
@@ -59,6 +59,7 @@ def add_transaction(request):
         context = {
             'transaction': transaction
         }
+
     return HttpResponse(template.render(context, request))
 
 def retrieve_transaction(request):

@@ -1,0 +1,11 @@
+<a href="{% url 'index' %}">Home</a>
+
+<form action="{% url 'add_refund' %}" method="post">
+    {% csrf_token %}
+    <label>Insert transaction id you want to refund: </label>
+    <input id="transaction_id" name="transaction_id" type="text">
+
+   <input type="submit" value="Refund Transaction">
+</form>
+
+<label>{{refund}}</label>

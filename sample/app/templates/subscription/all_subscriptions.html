@@ -1,0 +1,11 @@
+<a href="{% url 'index' %}">Home</a>
+<br/>
+
+{{subscriptions.pagination}}
+<br/>
+
+{% for subscription in subscriptions.items %}
+    {{ forloop.counter }}
+    <label>{{index}}. {{subscription}}</label>
+    <br/>
+{% endfor %}

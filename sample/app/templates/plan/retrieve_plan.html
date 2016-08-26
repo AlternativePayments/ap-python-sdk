@@ -1,0 +1,11 @@
+<a href="{% url 'index' %}">Home</a>
+<br/>
+
+<form action="{% url 'retrieve_plan' %}" method="get">
+    <label>Insert plan id: </label>
+    <input id="plan_id" name="plan_id" type="text">
+
+    <input type="submit" value="Retrieve">
+</form>
+
+<label>{{plan}}</label>

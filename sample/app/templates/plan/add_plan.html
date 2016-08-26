@@ -1,0 +1,17 @@
+<a href="{% url 'index' %}">Home</a>
+<br/>
+
+<form action="{% url 'add_plan' %}" method="post">
+    {% csrf_token %}
+    <label>Insert plan name: </label>
+    <input id="plan_name" name="plan_name" type="text">
+
+    <br/>
+    <label>Insert plan amount: </label>
+    <input id="plan_amount" name="plan_amount" type="text">
+    <br/>
+
+    <input type="submit" value="Create">
+</form>
+
+<label>{{plan}}</label>
