@@ -42,23 +42,23 @@
     <td><a href="{% url 'all_transactions' %}">Get all transactions</a></td>
   </tr>
   <tr>
-    <td><a href="<%= new_subscription_path %>">Add subscription</a></td>
-    <td><a href="<%= subscription_index_path %>">Get subscription</a></td>
-    <td><a href="<%= subscriptions_path %>">Get all subscriptions</a></td>
+    <td><a href="{% url 'add_subscription' %}">Add subscription</a></td>
+    <td><a href="{% url 'retrieve_subscription' %}">Get subscription</a></td>
+    <td><a href="{% url 'all_subscriptions' %}">Get all subscriptions</a></td>
   </tr>
   <tr>
-    <td><a href="<%= new_plan_path %>">Add plan</a></td>
-    <td><a href="<%= plan_index_path %>">Get plan</a></td>
-    <td><a href="<%= plans_path %>">Get all plans</a></td>
+    <td><a href="{% url 'add_plan' %}">Add plan</a></td>
+    <td><a href="{% url 'retrieve_plan' %}">Get plan</a></td>
+    <td><a href="{% url 'all_plans' %}">Get all plans</a></td>
   </tr>
   <tr>
-    <td><a href="<%= new_void_path %>">Void Transaction</a></td>
-    <td><a href="<%= void_index_path %>">Get Void</a></td>
-    <td><a href="<%= voids_path %>">Get all voids for transaction</a></td>
+    <td><a href="{% url 'add_void' %}">Void Transaction</a></td>
+    <td><a href="{% url 'retrieve_void' %}">Get Void</a></td>
+    <td><a href="{% url 'all_voids' %}">Get all voids for transaction</a></td>
   </tr>
   <tr>
-    <td><a href="<%= new_refund_path %>">Refund Transaction</a></td>
-    <td><a href="<%= refund_index_path %>">Get Refund</a></td>
-    <td><a href="<%= refunds_path %>">Get all refunds for transaction</a></td>
+    <td><a href="{% url 'add_refund' %}">Refund Transaction</a></td>
+    <td><a href="{% url 'retrieve_refund' %}">Get Refund</a></td>
+    <td><a href="{% url 'all_refunds' %}">Get all refunds for transaction</a></td>
   </tr>
 </table>

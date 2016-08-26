@@ -1,10 +1,13 @@
 <a href="{% url 'index' %}">Home</a>
 
-<form action="{% url 'retrieve_transaction' %}" method="get">
+<form action="{% url 'retrieve_refund' %}" method="get">
     <label>Insert transaction id: </label>
     <input id="transaction_id" name="transaction_id" type="text">
+
+    <label>Insert refund id: </label>
+    <input id="refund_id" name="refund_id" type="text">
 
     <input type="submit" value="Retrieve">
 </form>
 
-<label>{{transaction}}</label>
+<label>{{refund}}</label>

@@ -1,0 +1,11 @@
+<a href="{% url 'index' %}">Home</a>
+<br/>
+
+{{plans.pagination}}
+<br/>
+
+{% for plan in plans.items %}
+    {{ forloop.counter }}
+    <label>{{index}}. {{plan}}</label>
+    <br/>
+{% endfor %}
