@@ -1,8 +1,6 @@
 from __builtin__ import classmethod
-from dulwich.web import url_prefix
-import sys
-
 from ap_python_sdk import api_requester, util
+import sys
 
 
 def convert_to_ap_object(resp, class_url):
