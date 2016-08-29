@@ -1,4 +1,6 @@
 .project
 .pydevproject
 
-ap_python_sdk_key.py
+src/ap_python_sdk.egg-info/*
+src/build/*
+src/dist/*
