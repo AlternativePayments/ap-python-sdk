@@ -1,7 +1,7 @@
+from ap_python_sdk.resources import Transaction, Customer, Payment, RedirectUrls
 from django.http import HttpResponse
 from django.template import loader
 
-from ap_python_sdk.resources import Transaction, Customer, Payment, RedirectUrls
 
 def add_transaction(request):
     template = loader.get_template('transaction/add_transaction.html')
@@ -126,7 +126,8 @@ def __create_brazil_pay_boleto_transaction():
     payment = Payment(
         paymentOption='BrazilPayBankTransfer',
         holder='JoseSilva',
-        documentId='853.513.468-93'
+        documentId='853.513.468-93',
+        bankCode='hsbc'
     )
 
     redirectUrls = RedirectUrls(
@@ -411,7 +412,7 @@ def __create_credit_card_transaction():
         firstName='John',
         lastName='Doe',
         email='john@doe.com',
-        country='DE'
+        country='US'
     )
 
     payment = Payment(
