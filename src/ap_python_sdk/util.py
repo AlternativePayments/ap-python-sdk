@@ -1,3 +1,4 @@
+import base64
 import logging
 import os
 import sys
@@ -50,7 +51,8 @@ def utf8(value):
     else:
         return value
 
-
-def is_appengine_dev():
-    return ('APPENGINE_RUNTIME' in os.environ and
-            'Dev' in os.environ.get('SERVER_SOFTWARE', ''))
+def encode_key(key):
+    if sys.version_info < (3, 0):
+        return base64.b64encode(key)
+    else:
+        return base64.b64encode(key.encode('utf-8')).decode()
