@@ -3,7 +3,7 @@ Python SDK for AlternativePayments API.
 
 ## Python SDK
 
-`src/ap_python_sdk` folder contains library which wraps communication with Alternative Payments REST server. You can find out more in [readme for library](https://github.com/AlternativePayments/ap-python-sdk/tree/master/src/ap_python_sdk/README.md) or on [official documentation](http://www.alternativepayments.com/support/api/index.html?python#introduction).
+`src/ap_python_sdk` folder contains library which wraps communication with Alternative Payments REST server. You can find out more in [readme for library](https://github.com/AlternativePayments/ap-python-sdk/blob/master/src/README.md) or on [official documentation](http://www.alternativepayments.com/support/api/index.html?python#introduction).
 
 ## Sample Application
 

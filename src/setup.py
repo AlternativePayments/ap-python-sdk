@@ -1,17 +1,16 @@
-"""
-setuptools based setup module.
-
-See:
-https://packaging.python.org/en/latest/distributing.html
-https://github.com/pypa/sampleproject
-"""
-
-# Always prefer setuptools over distutils
-from codecs import open
 import os
-from setuptools import setup
 import sys
 import warnings
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
+try:
+    from distutils.command.build_py import build_py_2to3 as build_py
+except ImportError:
+    from distutils.command.build_py import build_py
 
 
 # Don't import AP module here, since deps may not be installed
@@ -24,7 +23,7 @@ install_requires = []
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from the README file
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+with open('LONG_DESCRIPTION.rst') as f:
     long_description = f.read()
 
 if sys.version_info < (2, 7):
@@ -37,9 +36,11 @@ install_requires.append('requests >= 0.8.8')
 
 setup(
     name='ap_python_sdk',
-    version='0.0.3',
+    version='0.0.6',
     description='SDK for python application to use Alternative Payments',
     long_description=long_description,
+
+     cmdclass={'build_py': build_py},
 
     url='https://github.com/AlternativePayments/ap-python-sdk',
 

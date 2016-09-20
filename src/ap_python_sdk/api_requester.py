@@ -1,12 +1,10 @@
-import base64
+from ap_python_sdk import error, http_client, version, util
+import ap_python_sdk
 import calendar
 import datetime
 import time
 import urllib
 import urlparse
-
-from ap_python_sdk import error, http_client, version, util
-import ap_python_sdk
 
 
 def _encode_datetime(dttime):
@@ -130,7 +128,7 @@ class APIRequester(object):
 
         headers = {
             'User-Agent': 'AlternativePayments Python SDK v%s' % (version.VERSION),
-            'Authorization': 'Basic %s' % (base64.b64encode(my_api_key),),
+            'Authorization': 'Basic %s' % (util.encode_key(my_api_key),),
             'Content-Type': 'application/json'
         }
 
