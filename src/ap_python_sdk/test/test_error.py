@@ -1,17 +1,21 @@
-from ap_python_sdk.api_requester import APIRequester
-from ap_python_sdk.error import APIError
+from ap_python_sdk.error import AlternativePaymentsError, APIError, \
+    InvalidParameterError
 import unittest
 
 
 class ErrorTest(unittest.TestCase):
 
-
     def test_alternative_payments_error(self):
-        api_requester = APIRequester()
-        err = api_requester.interpret_response("Unexpected error communicating with Alternative Payments.", 404)
+        err = AlternativePaymentsError("Unexpected error communicating with Alternative Payments.")
+        assert("Unexpected error communicating with Alternative Payments.", err.message)
 
-        assert(isinstance(err, APIError))
-        print(err.message)
+    def test_api_error(self):
+        err = APIError("Unexpected error communicating with Alternative Payments.")
+        assert("Unexpected error communicating with Alternative Payments.", err.message)
+
+    def test_invalid_parameter_error(self):
+        err = InvalidParameterError("Invalid parameter error")
+        assert("Invalid parameter error", err.message)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
