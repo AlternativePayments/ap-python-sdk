@@ -1,10 +1,10 @@
-from ap_python_sdk.resources import Customer, Payment, Plan, Period, Transaction
+from ap_python_sdk.resources import Customer, Payment, Plan, Period, Transaction, \
+    Subscription, Void
 from numpy.ma.testutils import assert_equal
 import unittest
 
 
 class Test(unittest.TestCase):
-
 
     def test_customer(self):
         customer = Customer(
@@ -89,6 +89,17 @@ class Test(unittest.TestCase):
         assert_equal(transaction.description, "test sepa php sdk")
         assert_equal(transaction.merchantPassThruData, "test_sepa_123")
         assert_equal(transaction.iPAddress, "127.0.0.1")
+
+    def test_subscription(self):
+        subscription = Subscription(
+            paymentId="pay_2131221f312",
+            customerId="cus_bd838e3611d34d598",
+            planId="plan_231f2ewqsf12"
+        )
+
+        assert_equal(subscription.paymentId, "pay_2131221f312")
+        assert_equal(subscription.customerId, "cus_bd838e3611d34d598")
+        assert_equal(subscription.planId, "plan_231f2ewqsf12")
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

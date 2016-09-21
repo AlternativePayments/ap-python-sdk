@@ -16,7 +16,7 @@ class ErrorTest(unittest.TestCase):
 
     def test_invalid_parameter_error(self):
         err = InvalidParameterError("Invalid parameter name error.", "name")
-        assert("Invalid parameter name.", err.message)
+        assert_equal("Invalid parameter name.", err.message)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
