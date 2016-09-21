@@ -15,7 +15,7 @@ class ErrorTest(unittest.TestCase):
         assert_equal(err.message, "Unexpected error communicating with Alternative Payments.")
 
     def test_invalid_parameter_error(self):
-        err = InvalidParameterError("Invalid parameter name error.", "name")
+        err = InvalidParameterError("Invalid parameter name.", "name")
         assert_equal("Invalid parameter name.", err.message)
 
 if __name__ == "__main__":
