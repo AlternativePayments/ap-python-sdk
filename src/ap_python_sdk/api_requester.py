@@ -61,7 +61,6 @@ class APIRequester(object):
         self.api_base = api_base or ap_python_sdk.api_base
         self.api_key = key
 
-        # TODO: optimize for client to created only once
         self._client = client or ap_python_sdk.default_http_client or \
             http_client.new_default_http_client()
 

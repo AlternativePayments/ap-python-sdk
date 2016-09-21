@@ -1,4 +1,7 @@
 language: python
 python: 2.7
 
+install:
+  - pip install requests
+
 script: cd src/ap_python_sdk/test && nosetests
