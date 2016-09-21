@@ -1,4 +1,4 @@
 language: python
 python: 2.7
 
-script: cd src/ap_python_sdk && nosetests
+script: cd src/ap_python_sdk/test && nosetests
