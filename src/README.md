@@ -15,8 +15,8 @@ In your initializing files add line:
 ```python
 import ap_python_sdk
 
-ap_python_sdk.api_secret_key = 'sk_test_sqJojfKHxRJu0jHFac7bNwf4gQ9HlatcJHTGn03o'
-ap_python_sdk.api_public_key = 'pk_test_qwes24d548h8rg74r5d423c1vx4few8f4qr7q9wd'
+ap_python_sdk.api_secret_key = 'Fill it with your own secret key.'
+ap_python_sdk.api_public_key = 'Fill it with your own public key.'
 ```
 
 ## Usage
