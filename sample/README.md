@@ -13,8 +13,9 @@
      Python 2.x:
 
         - Clone repo
-        - Inside folder +sample_application/sample_application/ap_python_sdk_key.py+ set your account key
-            eg. +ap_python_sdk.api_key = 'Test/Live key provided in your Alternative Payments account'+
+        - Inside folder +sample_application/sample_application/ap_python_sdk_key.py+ set your account's public and secret keys
+            eg. +ap_python_sdk.api_secret_key = 'Test/Live secret key provided in your Alternative Payments account'+
+            +ap_python_sdk.api_public_key = 'Test/Live public key provided in your Alternative Payments account'+
         - Start Django server by runing +python manage.py runserver+ from inside folder +sample+
         - If your setup is default one then access application on +http://localhost:8000/app+
 

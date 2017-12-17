@@ -33,6 +33,11 @@ urlpatterns = [
     url(r'^retrieve_customer', views.customers.retrieve_customer, name='retrieve_customer'),
     url(r'^all_customers', views.customers.all_customers, name='all_customers'),
 
+    # PhoneVerification/Website URLs
+    url(r'^add_phone_verification', views.website.add_phone_verification, name='add_phone_verification'),
+    url(r'^check_phone_verification_turned_on', views.website.check_phone_verification_turned_on, name='check_phone_verification_turned_on'),
+    url(r'^add_SEPA_transaction_with_phone_verification', views.website.add_SEPA_transaction_with_phone_verification, name='add_SEPA_transaction_with_phone_verification'),
+
     # Home URL
     url(r'^$', views.home.index, name='index'),
 ]

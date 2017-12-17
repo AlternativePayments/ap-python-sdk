@@ -15,7 +15,8 @@ In your initializing files add line:
 ```python
 import ap_python_sdk
 
-ap_python_sdk.api_key = 'sk_test_sqJojfKHxRJu0jHFac7bNwf4gQ9HlatcJHTGn03o'
+ap_python_sdk.api_secret_key = 'Fill it with your own secret key.'
+ap_python_sdk.api_public_key = 'Fill it with your own public key.'
 ```
 
 ## Usage
@@ -67,7 +68,7 @@ Create SEPA transaction:
         'currency': 'EUR',
         'description': 'test sepa php sdk',
         'merchantPassThruData': 'test_sepa_123',
-        'iPAddress': '127.0.0.1'
+        'ipAddress': '127.0.0.1'
     })
 
 Access customer:

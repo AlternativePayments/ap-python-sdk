@@ -36,7 +36,7 @@ install_requires.append('requests >= 0.8.8')
 
 setup(
     name='ap_python_sdk',
-    version='0.0.6',
+    version='0.1.3',
     description='SDK for python application to use Alternative Payments',
     long_description=long_description,
 

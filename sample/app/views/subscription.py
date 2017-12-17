@@ -1,7 +1,7 @@
+from ap_python_sdk.resources import Subscription, Plan, Transaction, Customer, Period, Payment, PhoneVerification
 from django.http import HttpResponse
 from django.template import loader
 
-from ap_python_sdk.resources import Subscription, Plan, Transaction, Customer, Period, Payment
 
 def add_subscription(request):
     template = loader.get_template('subscription/add_subscription.html')
@@ -17,12 +17,16 @@ def add_subscription(request):
         and email != None and email != "":
 
         plan = Plan.create({
-            'interval': 1,
-            'period': Period.DAY,
+            'intervalCount': 1,
+            'intervalUnit': Period.DAY,
             'amount': plan_amount,
             'currency': 'EUR',
             'name': plan_name,
-            'description': 'Test plan'
+            'description': 'Test plan',
+            'billingCycles': 12,
+            'isConversionRateFixed': True,
+            'ipAddress': '91.218.229.20',
+            'trialPeriod': 7
         })
 
         customer = Customer(
@@ -35,8 +39,15 @@ def add_subscription(request):
         payment = Payment(
             paymentOption='SEPA',
             holder='John Doe',
-            iban='BE88271080782541'
+            iban='DE89370400440532013000'
         )
+
+        phone_verification = PhoneVerification.create_phone_verification(
+          {
+            'phone': '+15555555555'
+           }
+        )
+        phone_verification['pin'] = 1234
 
         transaction = Transaction.create({
             'customer': customer,
@@ -45,13 +56,17 @@ def add_subscription(request):
             'currency': 'EUR',
             'description': 'test sepa php sdk',
             'merchantPassThruData': 'test_sepa_123',
-            'iPAddress': '127.0.0.1'
+            'ipAddress': '127.0.0.1',
+            'phoneverification': phone_verification
         })
 
         subscription = Subscription.create({
+            'quantity': 2,
+            'ipAddress': '91.218.229.20',
             'paymentId': transaction.payment.id,
             'customerId': transaction.customer.id,
-            'planId': plan.id
+            'planId': plan.id,
+            'phoneverification': phone_verification
         })
 
         context = {

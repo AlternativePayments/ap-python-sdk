@@ -1,5 +1,5 @@
 from __builtin__ import classmethod
-from ap_python_sdk import api_requester, util
+from ap_python_sdk import api_requester, util, api_public_key as globaly_defined_api_public_key
 import sys
 
 
@@ -8,7 +8,10 @@ def convert_to_ap_object(resp, class_url):
         '/customers': Customer,
         '/preauthorizations': Preauthorization,
         '/phoneverification': PhoneVerification,
+        '/websites': Website,
+        '/paymentoptions': PaymentOption,
         '/transactions': Transaction,
+        '/transactions/hosted': HostedTransaction,
         '/plans': Plan,
         '/subscriptions': Subscription,
         '/voids': Void,
@@ -151,8 +154,8 @@ class APIResource(BaseModel):
 class ListableAPIResource(APIResource):
 
     @classmethod
-    def all(cls, api_key=None, url_prefix=None, **pagination_options):
-        requester = api_requester.APIRequester(api_key)
+    def all(cls, api_secret_key=None, api_public_key=None, url_prefix=None, **pagination_options):
+        requester = api_requester.APIRequester(api_secret_key, api_public_key)
 
         response = requester.request('get', '%s/' % cls.url_with_prefix(url_prefix), pagination_options)
         list_objects = convert_to_ap_object(response[cls.list_members()], cls.class_url())
@@ -165,8 +168,8 @@ class ListableAPIResource(APIResource):
 class CreateableAPIResource(APIResource):
 
     @classmethod
-    def create(cls, params={}, url_prefix=None, api_key=None):
-        requester = api_requester.APIRequester(api_key)
+    def create(cls, params={}, url_prefix=None, api_secret_key=None, api_public_key=None):
+        requester = api_requester.APIRequester(api_secret_key, api_public_key)
         headers = {}
         response = requester.request('post', cls.url_with_prefix(url_prefix), params, headers)
 
@@ -175,12 +178,25 @@ class CreateableAPIResource(APIResource):
 class RetrivableAPIResource(APIResource):
 
     @classmethod
-    def retrieve(self, id, params={}, url_prefix=None, api_key=None):
-        requester = api_requester.APIRequester(api_key)
+    def retrieve(self, id, params={}, url_prefix=None, api_secret_key=None, api_public_key=None):
+        requester = api_requester.APIRequester(api_secret_key, api_public_key)
         headers = {}
         response = requester.request('get', "%s/%s" % (self.url_with_prefix(url_prefix), id), params, headers)
 
         return convert_to_ap_object(response, self.class_url())
+
+class CreatePhoneVerificationAPIResource(APIResource):
+    
+    @classmethod
+    def create_phone_verification(cls, params={}, url_prefix=None, api_secret_key=None, api_public_key=None):
+        api_public_key = api_public_key or globaly_defined_api_public_key
+
+        params['key'] = api_public_key
+        requester = api_requester.APIRequester(api_secret_key, api_public_key)
+        headers = {}
+        response = requester.request('post', cls.url_with_prefix(url_prefix), params, headers)
+
+        return convert_to_ap_object(response, cls.class_url())
 
 # API objects
 class Customer(CreateableAPIResource, ListableAPIResource, RetrivableAPIResource):
@@ -195,6 +211,26 @@ class Customer(CreateableAPIResource, ListableAPIResource, RetrivableAPIResource
 
 class Payment(BaseModel):
     pass
+
+class PaymentOption(RetrivableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/paymentoptions'
+
+    @classmethod
+    def list_members(cls):
+        return 'paymentoptions'
+
+class Website(RetrivableAPIResource):
+
+    @classmethod
+    def class_url(cls):
+        return '/websites'
+
+    @classmethod
+    def is_phone_verification_on(cls, payment_option=None):
+        return PaymentOption.retrieve(payment_option, {}, '%s/%s' % (cls.class_url(), globaly_defined_api_public_key))
 
 class RedirectUrls(BaseModel):
     pass
@@ -215,7 +251,7 @@ class Preauthorization(CreateableAPIResource, RetrivableAPIResource):
     def payment(self, **payment):
         self.payment = Payment(**payment)
 
-class PhoneVerification(CreateableAPIResource, RetrivableAPIResource):
+class PhoneVerification(CreateableAPIResource, CreatePhoneVerificationAPIResource, RetrivableAPIResource):
 
     @classmethod
     def class_url(cls):
@@ -284,6 +320,16 @@ class Transaction(CreateableAPIResource, ListableAPIResource, RetrivableAPIResou
 
     def phoneverification(self, **phoneverification):
         self.phoneverification = PhoneVerification(**phoneverification)
+
+class HostedTransaction(Transaction):
+    
+    @classmethod
+    def class_url(cls):
+        return '/transactions/hosted'
+
+    @classmethod
+    def list_members(cls):
+        return 'transactions'
 
 class Plan(CreateableAPIResource, RetrivableAPIResource, ListableAPIResource):
 
