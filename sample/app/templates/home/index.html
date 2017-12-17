@@ -10,36 +10,65 @@
   <tr>
     <td><table>
       <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=sepa">Add SEPA transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=alipay">Add Alipay transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=mistercash">Add MisterCash transaction</a></td></tr>
       <tr>
         <td><a href="{% url 'add_transaction' %}?transaction_type=brazil_pay_boleto">Add BrazilPayBoleto transaction</a></td></tr>
       <tr>
         <td><a href="{% url 'add_transaction' %}?transaction_type=brazil_pay_bank_transfer">Add BrazilPayBankTransfer transaction</a></td></tr>
       <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=teleingreso">Add Teleingreso transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=brazil_pay_charge_card">Add BrazilPay Charge Card transaction</a></td></tr>
       <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=safetypay">Add SafetyPay transaction</a></td></tr>
-      <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=poli">Add POLi transaction</a></td></tr>
-      <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=ideal">Add IDEAL transaction</a></td></tr>
-      <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=trustpay">Add TrustPay transaction</a></td></tr>
-      <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=mistercash">Add MisterCash transaction</a></td></tr>
-      <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=przelewy24">Add Przelewy24 transaction</a></td></tr>
-      <tr>
-        <td><a href="{% url 'add_transaction' %}?transaction_type=giropay">Add GiroPay transaction</a></td></tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=cashu">Add Cashu transaction</a></td></tr>
       <tr>
         <td><a href="{% url 'add_transaction' %}?transaction_type=credit_card">Add Credit Card transaction</a></td></tr>
       <tr>
         <td><a href="{% url 'add_transaction' %}?transaction_type=directpay">Add DirectPay transaction</a></td></tr>
       <tr>
         <td><a href="{% url 'add_transaction' %}?transaction_type=directpaymax">Add DirectPayMax transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=eps">Add EPS transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=giropay">Add GiroPay transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=ideal">Add IDEAL transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=mcoinz">Add mCoinz transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=paysafe">Add PaySafe transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=poli">Add POLi transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=przelewy24">Add Przelewy24 transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=przelewy24">Add QIWI transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=safetypay">Add SafetyPay transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=sepa">Add SEPA transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=sofort_uberweisung">Add SOFORT Überweisung transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=trustpay">Add TrustPay transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=teleingreso">Add Teleingreso transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=tenpay">Add TenPay transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=unionpay">Add UnionPay transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=verkkopankki">Add Verkkopankki transaction</a></td></tr>
+      <tr>
+        <td><a href="{% url 'add_transaction' %}?transaction_type=hosted_transaction">Add Hosted BrazilPayBankTransfer transaction</a></td></tr>
     </table></td>
     <td><a href="{% url 'retrieve_transaction' %}">Get transaction</a></td>
     <td><a href="{% url 'all_transactions' %}">Get all transactions</a></td>
+  </tr>
+  <tr>
+    <td><a href="{% url 'add_phone_verification' %}">Create phone verification object</a></td>
+    <td><a href="{% url 'check_phone_verification_turned_on' %}">Check if phone verification is turned on for SEPA</a></td>
+    <td><a href="{% url 'add_SEPA_transaction_with_phone_verification' %}">Create SEPA with phone verification</a></td>
   </tr>
   <tr>
     <td><a href="{% url 'add_subscription' %}">Add subscription</a></td>

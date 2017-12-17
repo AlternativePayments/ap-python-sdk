@@ -6,7 +6,8 @@
 
 # Configuration variables
 
-api_key = None
+api_secret_key = None
+api_public_key = None
 api_base = 'https://api.alternativepayments.com/api'
 api_version = None
 default_http_client = None

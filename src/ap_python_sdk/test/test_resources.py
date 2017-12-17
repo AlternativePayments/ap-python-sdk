@@ -69,9 +69,11 @@ class Test(unittest.TestCase):
              payment=payment,
              amount=500,
              currency="EUR",
+             isRecurring=True,
+             initialTransactionId="trn_d12209838b",
              description="test sepa php sdk",
              merchantPassThruData="test_sepa_123",
-             iPAddress="127.0.0.1"
+             ipAddress="127.0.0.1"
         )
 
         assert_equal(transaction.customer.id, "cus_bd838e3611d34d598")
@@ -88,7 +90,7 @@ class Test(unittest.TestCase):
         assert_equal(transaction.currency, "EUR")
         assert_equal(transaction.description, "test sepa php sdk")
         assert_equal(transaction.merchantPassThruData, "test_sepa_123")
-        assert_equal(transaction.iPAddress, "127.0.0.1")
+        assert_equal(transaction.ipAddress, "127.0.0.1")
 
     def test_subscription(self):
         subscription = Subscription(

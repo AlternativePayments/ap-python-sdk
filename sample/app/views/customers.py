@@ -1,7 +1,7 @@
+from ap_python_sdk.resources import Customer
 from django.http import HttpResponse
 from django.template import loader
 
-from ap_python_sdk.resources import Customer
 
 def add_customer(request):
     template = loader.get_template('customer/add_customer.html')
@@ -23,7 +23,7 @@ def add_customer(request):
                                     'phone': '55555555555',
                                     'created': '2016-03-24T15:19:10.7800694Z'
                                }
-        );
+        )
 
         context = {
             'customer': customer

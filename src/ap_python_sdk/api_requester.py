@@ -57,9 +57,10 @@ def _build_api_url(url, query):
 
 class APIRequester(object):
 
-    def __init__(self, key=None, client=None, api_base=None, account=None):
+    def __init__(self, key=None, public_key=None, client=None, api_base=None, account=None):
         self.api_base = api_base or ap_python_sdk.api_base
-        self.api_key = key
+        self.api_secret_key = key
+        self.api_public_key = public_key
 
         self._client = client or ap_python_sdk.default_http_client or \
             http_client.new_default_http_client()
@@ -100,16 +101,27 @@ class APIRequester(object):
                 rbody, rcode, error_response)
 
     def request_raw(self, method, url, params=None, supplied_headers=None):
-        if self.api_key:
-            my_api_key = self.api_key
+        if self.api_secret_key:
+            my_api_secret_key = self.api_secret_key
         else:
-            from ap_python_sdk import api_key
-            my_api_key = api_key
+            from ap_python_sdk import api_secret_key
+            my_api_secret_key = api_secret_key
 
-        if my_api_key is None:
+        if self.api_public_key:
+            my_api_public_key = self.api_public_key
+        else:
+            from ap_python_sdk import api_public_key
+            my_api_public_key = api_public_key
+
+        if my_api_secret_key is None:
             raise error.AuthenticationError(
-                'No API key provided. (HINT: set your API key using '
-                '"ap_python_sdk.api_key = <API-KEY>").')
+                'No secret API key provided. (HINT: set your secret API key using '
+                '"ap_python_sdk.api_secret_key = <API-KEY>").')
+
+        if my_api_public_key is None:
+            raise error.AuthenticationError(
+                'No public API key provided. (HINT: set your public API key using '
+                '"ap_python_sdk.api_public_key = <API-KEY>").')
 
         abs_url = '%s%s' % (self.api_base, url)
 
@@ -127,7 +139,7 @@ class APIRequester(object):
 
         headers = {
             'User-Agent': 'AlternativePayments Python SDK v%s' % (version.VERSION),
-            'Authorization': 'Basic %s' % (util.encode_key(my_api_key),),
+            'Authorization': 'Basic %s' % (util.encode_key(my_api_secret_key),),
             'Content-Type': 'application/json'
         }
 

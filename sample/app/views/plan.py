@@ -1,7 +1,7 @@
+from ap_python_sdk.resources import Plan, Period
 from django.http import HttpResponse
 from django.template import loader
 
-from ap_python_sdk.resources import Plan, Period
 
 def add_plan(request):
     template = loader.get_template('plan/add_plan.html')
@@ -14,12 +14,16 @@ def add_plan(request):
     if plan_name != None and plan_name != "" \
         and plan_amount != None and plan_amount != "":
         plan = Plan.create({
-                                'interval': 1,
-                                'period': Period.DAY,
+                                'intervalCount': 1,
+                                'intervalUnit': Period.DAY,
                                 'amount': plan_amount,
                                 'currency': 'EUR',
                                 'name': plan_name,
-                                'description': 'Test plan'
+                                'description': 'Test plan',
+                                'billingCycles': 12,
+                                'isConversionRateFixed': True,
+                                'ipAddress': '91.218.229.20',
+                                'trialPeriod': 7
                             })
 
         context = {
